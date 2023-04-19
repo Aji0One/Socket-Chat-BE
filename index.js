@@ -35,7 +35,7 @@ const server = app.listen(
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://poetic-souffle-a760f0.netlify.app",
+    origin: "https://poetic-souffle-a760f0.netlify.app/chat",
   },
 });
 
@@ -56,14 +56,15 @@ io.on("connection", (socket) => {
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
   socket.on("new message", (newMessageReceived) => {
+    console.log(newMessageReceived);
     var chat = newMessageReceived.chat;
 
     if (!chat.users) return console.log("chat.users not defined");
 
     chat.users.forEach((user) => {
-      if (user._id == newMessageReceived.sender._id) return;
+      if (user == newMessageReceived.sender._id) return;
 
-      socket.in(user._id).emit("message received", newMessageReceived);
+      socket.in(user).emit("message received", newMessageReceived);
     });
   });
 
